@@ -49,8 +49,12 @@ export async function getTransactionsByUserId(
   transactionType?: "income" | "expense",
   page: number = 1,
   pageSize: number = 6,
+  month?: string,
 ) {
   const offset = (page - 1) * pageSize;
+  const [year, monthNum] = month
+    ? month.split("-").map(Number)
+    : [null, null];
 
   const [rowsResult, countResult] = await Promise.all([
     pool.query(
@@ -69,10 +73,12 @@ export async function getTransactionsByUserId(
           ON transactions.category_id = categories.id
         WHERE transactions.user_id = $1
           AND ($2::VARCHAR IS NULL OR transactions.transaction_type = $2)
+          AND ($3::int IS NULL OR EXTRACT(YEAR FROM transactions.transaction_date) = $3)
+          AND ($4::int IS NULL OR EXTRACT(MONTH FROM transactions.transaction_date) = $4)
         ORDER BY transaction_date DESC, created_at DESC
-        LIMIT $3 OFFSET $4
+        LIMIT $5 OFFSET $6
       `,
-      [userId, transactionType ?? null, pageSize, offset],
+      [userId, transactionType ?? null, year, monthNum, pageSize, offset],
     ),
     pool.query(
       `
@@ -80,8 +86,10 @@ export async function getTransactionsByUserId(
         FROM transactions
         WHERE user_id = $1
           AND ($2::VARCHAR IS NULL OR transaction_type = $2)
+          AND ($3::int IS NULL OR EXTRACT(YEAR FROM transaction_date) = $3)
+          AND ($4::int IS NULL OR EXTRACT(MONTH FROM transaction_date) = $4)
       `,
-      [userId, transactionType ?? null],
+      [userId, transactionType ?? null, year, monthNum],
     ),
   ]);
 
@@ -138,6 +146,114 @@ export async function getTransactionSummaryByUserId(userId: string) {
   );
 
   return result.rows[0];
+}
+
+export async function getDailyActivityCounts(
+  userId: string,
+  startDate: string,
+  endDate: string,
+) {
+  const result = await pool.query(
+    `
+      SELECT
+        to_char(d, 'YYYY-MM-DD') AS day,
+        COUNT(transactions.id)::int AS count
+
+      FROM generate_series($2::date, $3::date, interval '1 day') AS d
+
+      LEFT JOIN transactions
+        ON DATE(transactions.created_at) = d::date
+        AND transactions.user_id = $1
+
+      GROUP BY d
+      ORDER BY d ASC
+    `,
+    [userId, startDate, endDate],
+  );
+
+  return result.rows as { day: string; count: number }[];
+}
+
+export async function getExpenseSummaryForCategory(
+  userId: string,
+  categoryId: string | null,
+  startDate: string | null,
+  endDate: string | null,
+) {
+  const result = await pool.query(
+    `
+      SELECT
+        COALESCE(SUM(amount), 0) AS total,
+        COUNT(*)::int AS count
+      FROM transactions
+      WHERE user_id = $1
+        AND transaction_type = 'expense'
+        AND ($2::uuid IS NULL OR category_id = $2)
+        AND ($3::date IS NULL OR transaction_date >= $3)
+        AND ($4::date IS NULL OR transaction_date <= $4)
+    `,
+    [userId, categoryId, startDate, endDate],
+  );
+
+  return {
+    total: Number(result.rows[0].total),
+    count: result.rows[0].count as number,
+  };
+}
+
+export async function getAllTransactionsForMonth(
+  userId: string,
+  year: number,
+  month: number,
+) {
+  const result = await pool.query(
+    `
+      SELECT
+        transactions.id,
+        transactions.amount,
+        transactions.transaction_type,
+        transactions.description,
+        transactions.transaction_date,
+        categories.name AS category_name
+      FROM transactions
+      LEFT JOIN categories
+        ON transactions.category_id = categories.id
+      WHERE transactions.user_id = $1
+        AND EXTRACT(YEAR FROM transactions.transaction_date) = $2
+        AND EXTRACT(MONTH FROM transactions.transaction_date) = $3
+      ORDER BY transactions.transaction_date ASC, transactions.created_at ASC
+    `,
+    [userId, year, month],
+  );
+
+  return result.rows;
+}
+
+export async function getCategoryBreakdownForMonth(
+  userId: string,
+  year: number,
+  month: number,
+) {
+  const result = await pool.query(
+    `
+      SELECT
+        COALESCE(categories.name, 'Uncategorized') AS category_name,
+        transactions.transaction_type,
+        SUM(transactions.amount)::int AS total,
+        COUNT(*)::int AS count
+      FROM transactions
+      LEFT JOIN categories
+        ON transactions.category_id = categories.id
+      WHERE transactions.user_id = $1
+        AND EXTRACT(YEAR FROM transactions.transaction_date) = $2
+        AND EXTRACT(MONTH FROM transactions.transaction_date) = $3
+      GROUP BY categories.name, transactions.transaction_type
+      ORDER BY total DESC
+    `,
+    [userId, year, month],
+  );
+
+  return result.rows;
 }
 
 export async function getMonthlyTransactionSummaryByUserId(

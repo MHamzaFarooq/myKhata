@@ -1,6 +1,7 @@
 import {
   createTransaction,
   deleteTransactionById,
+  getDailyActivityCounts,
   getMonthlyTransactionSummaryByUserId,
   getTransactionsByUserId,
   getTransactionSummaryByUserId,
@@ -34,12 +35,19 @@ export async function getTransactionsService(
   transactionType?: "income" | "expense",
   page: number = 1,
   pageSize: number = 6,
+  month?: string,
 ) {
   if (!userId) {
     throw new Error("Unauthorized");
   }
 
-  return await getTransactionsByUserId(userId, transactionType, page, pageSize);
+  return await getTransactionsByUserId(
+    userId,
+    transactionType,
+    page,
+    pageSize,
+    month,
+  );
 }
 
 export async function deleteTransactionService(
@@ -80,6 +88,27 @@ export async function getTransactionSummaryService(userId: string) {
   }
 }
 
+export async function getDailyActivityService(
+  userId: string,
+  year: number,
+  month: number,
+) {
+  try {
+    if (!userId) {
+      throw new Error("Unauthorized");
+    }
+
+    const pad = (n: number) => String(n).padStart(2, "0");
+    const daysInMonth = new Date(year, month, 0).getDate();
+    const startDate = `${year}-${pad(month)}-01`;
+    const endDate = `${year}-${pad(month)}-${pad(daysInMonth)}`;
+
+    return await getDailyActivityCounts(userId, startDate, endDate);
+  } catch (error) {
+    console.error("Error fetching daily activity:", error);
+  }
+}
+
 export async function getMonthlyTransactionSummaryService(
   userId: string,
   year: number,
@@ -95,7 +124,22 @@ export async function getMonthlyTransactionSummaryService(
       month,
     );
 
-    return summary;
+    // Running totals: each point is the cumulative income/expense up to
+    // that day, so the lines only ever climb instead of jumping back down
+    // on days with no activity.
+    let runningIncome = 0;
+    let runningExpense = 0;
+
+    return summary.map((row) => {
+      runningIncome += Number(row.income);
+      runningExpense += Number(row.expense);
+
+      return {
+        day: row.day,
+        income: runningIncome,
+        expense: runningExpense,
+      };
+    });
   } catch (error) {
     console.error("Error fetching monthly transaction summary:", error);
   }

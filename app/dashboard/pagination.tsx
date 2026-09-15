@@ -17,7 +17,7 @@ export default function Pagination({
   function goToPage(page: number) {
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", String(page));
-    router.push(`/dashboard?${params.toString()}`);
+    router.push(`/dashboard?${params.toString()}`, { scroll: false });
   }
 
   return (
@@ -26,7 +26,7 @@ export default function Pagination({
         aria-label="Previous page"
         disabled={currentPage <= 1}
         onClick={() => goToPage(currentPage - 1)}
-        className="flex items-center justify-center h-10 w-10 rounded-full bg-[#F4F6F8] text-[#0b1620] transition-colors hover:bg-[#E8ECEF] active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#F4F6F8]"
+        className="flex items-center justify-center h-10 w-10 rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white/10"
       >
         <svg
           className="h-4 w-4"
@@ -41,11 +41,15 @@ export default function Pagination({
         </svg>
       </button>
 
+      <span className="text-sm text-white/50">
+        Page {currentPage} of {totalPages}
+      </span>
+
       <button
         aria-label="Next page"
         disabled={currentPage >= totalPages}
         onClick={() => goToPage(currentPage + 1)}
-        className="flex items-center justify-center h-10 w-10 rounded-full bg-[#F4F6F8] text-[#0b1620] transition-colors hover:bg-[#E8ECEF] active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#F4F6F8]"
+        className="flex items-center justify-center h-10 w-10 rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white/10"
       >
         <svg
           className="h-4 w-4"

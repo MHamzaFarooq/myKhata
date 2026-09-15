@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { addTransaction } from "./actions";
 
 export default function TransactionForm({
@@ -22,13 +23,41 @@ export default function TransactionForm({
     }
   }, [state, router]);
 
+  useEffect(() => {
+    if (state?.message) {
+      if (state.success) {
+        toast.success(state.message);
+      } else {
+        toast.error(state.message);
+      }
+    }
+  }, [state]);
+
   return (
     <form
       ref={formRef}
       action={formAction}
-      className="w-full max-w-md rounded-3xl bg-[#101d27] p-4 space-y-6"
+      className="w-full max-w-md rounded-3xl bg-[#101d27] p-4 sm:p-6 space-y-6 shadow-xl shadow-black/10"
     >
-      <h2 className="text-[28px] text-white">Add Transaction</h2>
+      <div className="flex items-center gap-3">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#8CFF00]/10 text-[#8CFF00]">
+          <svg
+            className="h-4.5 w-4.5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M12 5v14" />
+            <path d="M5 12h14" />
+          </svg>
+        </div>
+        <h2 className="text-[24px] sm:text-[28px] text-white">
+          Add Transaction
+        </h2>
+      </div>
 
       {/* Transaction Type */}
       <div className="space-y-2">
@@ -162,16 +191,6 @@ export default function TransactionForm({
       >
         {isPending ? "Adding..." : "Add"}
       </button>
-
-      {state?.message && (
-        <p
-          className={`text-sm text-center ${
-            state.success ? "text-[#8CFF00]" : "text-red-400"
-          }`}
-        >
-          {state.message}
-        </p>
-      )}
     </form>
   );
 }

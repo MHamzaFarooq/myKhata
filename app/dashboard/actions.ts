@@ -2,6 +2,7 @@
 import { redirect } from "next/navigation";
 import { deleteSession, getCurrentUser } from "@/lib/session";
 import { transactionSchema } from "@/lib/validations/transactionSchema";
+import { updateUsernameSchema } from "@/lib/validations/userSchema";
 import {
   addTransaction as addTransactionService,
   deleteTransactionService,
@@ -9,11 +10,47 @@ import {
   getTransactionsService,
   getTransactionSummaryService,
 } from "@/lib/services/transactionsService";
+import { updateUsernameService } from "@/lib/services/userService";
+import {
+  sendTestMonthlyReportService,
+  updateMonthlyReportPreferenceService,
+} from "@/lib/services/reportService";
 
 export async function logoutUser() {
   await deleteSession();
 
   redirect("/login");
+}
+
+export async function updateUsername(
+  previousData: unknown,
+  formData: FormData,
+) {
+  const result = updateUsernameSchema.safeParse({
+    username: formData.get("username"),
+  });
+
+  if (!result.success) {
+    return {
+      success: false,
+      message: result.error.issues[0].message,
+    };
+  }
+
+  try {
+    const updated = await updateUsernameService(result.data.username);
+    return {
+      success: true,
+      message: "Username updated successfully.",
+      username: updated.username,
+    };
+  } catch (error) {
+    console.error("UPDATE USERNAME ERROR:", error);
+    return {
+      success: false,
+      message: "An error occurred while updating your username.",
+    };
+  }
 }
 
 export async function addTransaction(
@@ -59,6 +96,7 @@ export async function getTransactions(
   transactionType?: "income" | "expense",
   page: number = 1,
   pageSize: number = 6,
+  month?: string,
 ) {
   try {
     const { transactions, totalCount } = await getTransactionsService(
@@ -66,6 +104,7 @@ export async function getTransactions(
       transactionType,
       page,
       pageSize,
+      month,
     );
 
     return {
@@ -123,6 +162,41 @@ export async function getTransactionSummary(userId: string) {
     return {
       success: false,
       message: "An error occurred while fetching the transaction summary.",
+    };
+  }
+}
+
+export async function updateMonthlyReportPreference(enabled: boolean) {
+  try {
+    const updated = await updateMonthlyReportPreferenceService(enabled);
+    return {
+      success: true,
+      monthlyReportEnabled: updated.monthly_report_enabled as boolean,
+      message: enabled
+        ? "Monthly reports turned on."
+        : "Monthly reports turned off.",
+    };
+  } catch (error) {
+    console.error("UPDATE MONTHLY REPORT PREFERENCE ERROR:", error);
+    return {
+      success: false,
+      message: "An error occurred while updating your preference.",
+    };
+  }
+}
+
+export async function sendTestMonthlyReport() {
+  try {
+    await sendTestMonthlyReportService();
+    return {
+      success: true,
+      message: "Test report sent - check your inbox.",
+    };
+  } catch (error) {
+    console.error("SEND TEST MONTHLY REPORT ERROR:", error);
+    return {
+      success: false,
+      message: "Something went wrong while sending the test report.",
     };
   }
 }

@@ -2,6 +2,7 @@
 import bcrypt from "bcrypt";
 import pool from "@/lib/db";
 import { registerSchema } from "./registerSchema";
+import { createDefaultCategories } from "@/lib/repositories/categoryRepository";
 
 export async function registerUser(previousData: unknown, formData: FormData) {
   const username = formData.get("username") as string;
@@ -52,23 +53,7 @@ export async function registerUser(previousData: unknown, formData: FormData) {
     const user = userResult.rows[0];
 
     // Now creating the default expense categories for the new user
-    await client.query(
-      `
-        INSERT INTO categories (user_id, name)
-        VALUES
-          ($1, 'Food & Dining'),
-          ($1, 'Groceries'),
-          ($1, 'Transportation'),
-          ($1, 'Shopping'),
-          ($1, 'Bills & Utilities'),
-          ($1, 'Entertainment'),
-          ($1, 'Healthcare'),
-          ($1, 'Education'),
-          ($1, 'Rent'),
-          ($1, 'Other')
-      `,
-      [user.id],
-    );
+    await createDefaultCategories(client, user.id);
 
     // 3. Save everything
     await client.query("COMMIT");

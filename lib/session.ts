@@ -27,7 +27,11 @@ export async function getCurrentUser() {
 
   const result = await pool.query(
     `
-      SELECT users.id, users.username, users.email
+      SELECT
+        users.id,
+        users.username,
+        users.email,
+        users.monthly_report_enabled
       FROM sessions
       JOIN users ON sessions.user_id = users.id
       WHERE sessions.id = $1
