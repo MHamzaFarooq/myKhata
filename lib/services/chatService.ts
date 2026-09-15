@@ -4,7 +4,18 @@ import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { getExpenseSummaryForCategory } from "../repositories/transactionRepository";
 import { getCategoriesByUserId } from "../repositories/categoryRepository";
 
-const anthropic = new Anthropic();
+// Constructed lazily, not at module load - Next.js executes this module
+// during build-time page data collection, before Vercel env vars are
+// necessarily available, and the SDK throws immediately if no API key is
+// resolvable at construction time.
+let anthropic: Anthropic | null = null;
+
+function getAnthropicClient() {
+  if (!anthropic) {
+    anthropic = new Anthropic();
+  }
+  return anthropic;
+}
 
 const ExpenseQuerySchema = z.object({
   is_expense_question: z
@@ -78,7 +89,7 @@ Set is_expense_question to false for anything that is not exactly this kind of s
   let parsed: z.infer<typeof ExpenseQuerySchema> | null;
 
   try {
-    const response = await anthropic.messages.parse({
+    const response = await getAnthropicClient().messages.parse({
       model: "claude-opus-5",
       max_tokens: 1024,
       system: systemPrompt,

@@ -12,7 +12,18 @@ import { getCurrentUser } from "../session";
 import MonthlyReportPdf from "../pdf/monthly-report-pdf";
 import MonthlyReportEmail from "../../emails/monthly-report";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Constructed lazily, not at module load - Next.js executes this module
+// during build-time page data collection, before Vercel env vars are
+// necessarily available, and the Resend SDK throws immediately if the key
+// is missing at construction time.
+let resend: Resend | null = null;
+
+function getResendClient() {
+  if (!resend) {
+    resend = new Resend(process.env.RESEND_API_KEY);
+  }
+  return resend;
+}
 
 type ReportUser = { id: string; username: string; email: string };
 
@@ -75,7 +86,7 @@ export async function sendMonthlyReportEmail(
     }),
   );
 
-  const { error } = await resend.emails.send({
+  const { error } = await getResendClient().emails.send({
     from: process.env.RESEND_FROM_EMAIL ?? "MyKhata Reports <onboarding@resend.dev>",
     to: user.email,
     replyTo: process.env.RESEND_REPLY_TO_EMAIL,
