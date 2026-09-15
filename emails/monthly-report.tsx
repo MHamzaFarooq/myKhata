@@ -10,7 +10,10 @@ import {
   Text,
   Heading,
   Hr,
+  Img,
 } from "@react-email/components";
+
+const LOGO_URL = `${(process.env.APP_URL ?? "https://mykhata-three.vercel.app").replace(/\/$/, "")}/mykhata-logo.svg`;
 
 type MonthlyReportEmailProps = {
   username: string;
@@ -57,35 +60,7 @@ export default function MonthlyReportEmail({
           <Section style={{ backgroundColor: "#101d27", padding: "24px 32px" }}>
             <Row>
               <Column>
-                <table role="presentation" cellPadding={0} cellSpacing={0}>
-                  <tr>
-                    <td
-                      style={{
-                        width: "28px",
-                        height: "28px",
-                        borderRadius: "9px",
-                        backgroundColor: "#8CFF00",
-                        textAlign: "center",
-                        verticalAlign: "middle",
-                        fontWeight: 700,
-                        fontSize: "14px",
-                        color: "#101d27",
-                      }}
-                    >
-                      M
-                    </td>
-                    <td
-                      style={{
-                        paddingLeft: "10px",
-                        fontSize: "15px",
-                        fontWeight: 700,
-                        color: "#ffffff",
-                      }}
-                    >
-                      MyKhata
-                    </td>
-                  </tr>
-                </table>
+                <Img src={LOGO_URL} alt="MyKhata" width="120" height="20" />
               </Column>
               <Column align="right">
                 <Text

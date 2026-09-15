@@ -1,6 +1,13 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState, useTransition } from "react";
+import {
+  useActionState,
+  useEffect,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
@@ -24,10 +31,7 @@ export default function Navbar({
   const menuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  const [state, formAction, isPending] = useActionState(
-    updateUsername,
-    null,
-  );
+  const [state, formAction, isPending] = useActionState(updateUsername, null);
 
   const [isTogglePending, startToggleTransition] = useTransition();
   const [isTestPending, startTestTransition] = useTransition();
@@ -104,12 +108,13 @@ export default function Navbar({
 
   return (
     <div className="flex items-center justify-between">
-      <div className="flex items-center gap-2.5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-[#8CFF00] text-[15px] font-bold text-[#0b1620]">
-          M
-        </div>
-        <span className="text-[16px] font-medium">MyKhata</span>
-      </div>
+      <Image
+        src="/mykhata-logo.svg"
+        alt="MyKhata"
+        width={180}
+        height={36}
+        priority
+      />
 
       <div className="relative" ref={menuRef}>
         <button
@@ -266,8 +271,8 @@ export default function Navbar({
           <div className="w-full max-w-sm rounded-3xl bg-[#101d27] p-6 shadow-2xl">
             <h2 className="text-lg font-medium text-white">Monthly report</h2>
             <p className="mt-1 text-sm text-white/40">
-              Get a branded PDF summary of your income, expenses, and
-              category breakdown emailed to you on the 1st of every month.
+              Get a branded PDF summary of your income, expenses, and category
+              breakdown emailed to you on the 1st of every month.
             </p>
 
             <div className="mt-5 flex items-center justify-between gap-4 rounded-2xl bg-[#0b1620] px-5 py-4">

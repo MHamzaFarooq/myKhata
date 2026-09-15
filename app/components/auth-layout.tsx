@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function AuthLayout({
   title,
   subtitle,
@@ -17,11 +19,8 @@ export default function AuthLayout({
           "radial-gradient(700px circle at 85% 105%, rgba(150, 255, 4, 0.12), transparent 55%)",
       }}
     >
-      <div className="mb-8 flex items-center gap-2.5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-[#8CFF00] text-[15px] font-bold text-[#0b1620]">
-          M
-        </div>
-        <span className="text-[16px] font-medium text-white">MyKhata</span>
+      <div className="mb-8">
+        <Image src="/mykhata-logo.svg" alt="MyKhata" width={144} height={24} priority />
       </div>
 
       <div className="w-full max-w-md rounded-[32px] bg-[#101d27] p-8 shadow-2xl shadow-black/30">

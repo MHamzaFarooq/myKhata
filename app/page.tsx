@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 function MiniStat({
@@ -30,10 +31,12 @@ export default function Home() {
     >
       <header className="mx-auto flex w-full max-w-6xl items-center px-6 py-8 sm:px-8">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-[#8CFF00] text-[15px] font-bold text-[#0b1620]">
-            M
-          </div>
-          <span className="text-[16px] font-medium text-white">MyKhata</span>
+          <Image
+            src="/mykhata-logo.svg"
+            alt="MyKhata Logo"
+            width={180}
+            height={36}
+          />
         </div>
       </header>
 
@@ -51,9 +54,9 @@ export default function Home() {
             </h1>
 
             <p className="mt-4 max-w-md text-[15px] text-white/40 sm:text-base">
-              Track income and expenses, see your spending at a glance, and
-              get a clear monthly picture of your finances — all in one
-              simple dashboard.
+              Track income and expenses, see your spending at a glance, and get
+              a clear monthly picture of your finances — all in one simple
+              dashboard.
             </p>
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -95,9 +98,21 @@ export default function Home() {
               </div>
 
               <div className="mt-5 grid grid-cols-3 gap-3 rounded-2xl bg-[#101d27] p-4">
-                <MiniStat label="Income" value="45,000" valueColor="text-[#96FF04]" />
-                <MiniStat label="Expense" value="28,400" valueColor="text-[#FF6063]" />
-                <MiniStat label="Balance" value="16,600" valueColor="text-white" />
+                <MiniStat
+                  label="Income"
+                  value="45,000"
+                  valueColor="text-[#96FF04]"
+                />
+                <MiniStat
+                  label="Expense"
+                  value="28,400"
+                  valueColor="text-[#FF6063]"
+                />
+                <MiniStat
+                  label="Balance"
+                  value="16,600"
+                  valueColor="text-white"
+                />
               </div>
 
               <div className="mt-4 flex h-20 items-end gap-1.5 rounded-2xl bg-[#101d27] p-4">
