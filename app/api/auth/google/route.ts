@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import crypto from "crypto";
 
-export async function GET() {
+export async function GET(request: Request) {
   const state = crypto.randomBytes(16).toString("hex");
 
   const cookieStore = await cookies();
@@ -14,9 +14,16 @@ export async function GET() {
     path: "/",
   });
 
+  // Derived from the request rather than a fixed env var, so it always
+  // matches whichever domain the user is actually browsing (Vercel serves
+  // a project from several domains - the primary alias, git-branch
+  // aliases, a custom domain - and a mismatch here means the state cookie
+  // set on one origin never reaches the callback on another).
+  const redirectUri = new URL("/api/auth/google/callback", request.url).toString();
+
   const params = new URLSearchParams({
     client_id: process.env.GOOGLE_CLIENT_ID!,
-    redirect_uri: process.env.GOOGLE_REDIRECT_URI!,
+    redirect_uri: redirectUri,
     response_type: "code",
     scope: "openid email profile",
     access_type: "offline",

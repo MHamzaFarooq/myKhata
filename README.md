@@ -133,7 +133,8 @@ Create a `.env.local` file in the project root:
 | `RESEND_REPLY_TO_EMAIL` | Reply-to address for report emails |
 | `CRON_SECRET` | Random secret used to authorize the Vercel Cron request |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google OAuth credentials |
-| `GOOGLE_REDIRECT_URI` | e.g. `http://localhost:3000/api/auth/google/callback` |
+
+The OAuth callback URL is derived from the incoming request, not an env var, so it automatically matches whichever domain you're on (`localhost` in dev, your real domain in prod). For "Sign in with Google" to work, add `<your-domain>/api/auth/google/callback` to **Authorized redirect URIs** on your OAuth client in [Google Cloud Console](https://console.cloud.google.com/apis/credentials) — for every domain the app is reachable on (e.g. both `localhost:3000` for dev and your production domain).
 
 ### 3. Set up the database
 

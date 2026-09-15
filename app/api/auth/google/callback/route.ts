@@ -31,6 +31,14 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    // Must be byte-for-byte identical to the redirect_uri used to build the
+    // authorization URL - derive it the same way, from the request itself,
+    // rather than a fixed env var.
+    const redirectUri = new URL(
+      "/api/auth/google/callback",
+      request.url,
+    ).toString();
+
     const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -38,7 +46,7 @@ export async function GET(request: NextRequest) {
         code,
         client_id: process.env.GOOGLE_CLIENT_ID!,
         client_secret: process.env.GOOGLE_CLIENT_SECRET!,
-        redirect_uri: process.env.GOOGLE_REDIRECT_URI!,
+        redirect_uri: redirectUri,
         grant_type: "authorization_code",
       }),
     });
