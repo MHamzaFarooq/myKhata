@@ -292,8 +292,8 @@ export default function Navbar({
                 }`}
               >
                 <span
-                  className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition-transform duration-200 ease-out ${
-                    reportEnabled ? "translate-x-5.5" : "translate-x-1"
+                  className={`absolute top-1 left-1 h-5 w-5 rounded-full bg-white shadow transition-transform duration-200 ease-out ${
+                    reportEnabled ? "translate-x-5" : "translate-x-0"
                   }`}
                 />
               </button>
