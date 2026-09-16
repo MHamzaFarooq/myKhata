@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc *)",
+      "Bash(curl -s -o /dev/null -w \"dev:%{http_code}\\\\n\" http://localhost:3000/)",
+      "Bash(npm install *)",
+      "Bash(node .tmp-verify-home.mjs __TRACKED_VAR__/.tmp-home-full.png __TRACKED_VAR__/.tmp-home-dash-filtered.png __TRACKED_VAR__/.tmp-home-chat-filtered.png)",
+      "Bash(node .tmp-verify-home2.mjs __TRACKED_VAR__/.tmp-hero-viewport.png __TRACKED_VAR__/.tmp-dash-card-filtered.png)",
+      "Bash(rm -f .tmp-verify-home.mjs .tmp-verify-home2.mjs .tmp-home-full.png .tmp-home-dash-filtered.png .tmp-home-chat-filtered.png .tmp-hero-viewport.png .tmp-dash-card-filtered.png)",
+      "Bash(npm uninstall *)",
+      "Bash(git status *)"
+    ]
+  }
+}
