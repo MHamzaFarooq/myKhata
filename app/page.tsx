@@ -129,8 +129,8 @@ export default function Home() {
 
           <p className="mt-4 max-w-lg text-[15px] text-white/40 sm:text-base">
             Track income and expenses, ask an AI assistant about your spending,
-            and get a branded PDF summary emailed to you every month — all in
-            one simple dashboard.
+            and get a branded PDF summary emailed to you every month, all in one
+            simple dashboard.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
@@ -196,7 +196,7 @@ export default function Home() {
                 </h3>
                 <p className="mt-3 text-[15px] leading-relaxed text-white/40">
                   No digging through transaction lists. Just ask how much you
-                  spent on food, rent, or any category, for any time period —
+                  spent on food, rent, or any category, for any time period, and
                   Chotta computes the real answer straight from your own data,
                   in plain English.
                 </p>
@@ -228,9 +228,10 @@ export default function Home() {
                   A branded PDF, emailed every month
                 </h3>
                 <p className="mt-3 text-[15px] leading-relaxed text-white/40">
-                  Turn on monthly reports and get a full breakdown — income,
-                  expenses, category-by-category spending, and every transaction
-                  — delivered straight to your inbox on the 1st of each month.
+                  Turn on monthly reports and get a full breakdown of your
+                  income, expenses, category-by-category spending, and every
+                  transaction delivered straight to your inbox on the 1st of
+                  each month.
                 </p>
               </div>
             </div>
