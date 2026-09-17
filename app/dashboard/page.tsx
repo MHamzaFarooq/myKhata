@@ -1,14 +1,15 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/session";
-import { getTransactions, getTransactionSummary } from "./actions";
+import { getTransactionSummary } from "./actions";
 import TransactionForm from "./transaction-form";
 import { getCategoriesByUserId } from "@/lib/repositories/categoryRepository";
-import TransactionTable from "./transaction-table";
 import SummaryCards from "./summary-cards";
-import TransactionFilters from "./transaction-filter";
 import Navbar from "./navbar";
 import AppToaster from "./app-toaster";
 import ChatWidget from "./chat-widget";
+import TransactionsSection from "./transactions-section";
+import TransactionsSectionSkeleton from "./transactions-section-skeleton";
 
 export default async function DashboardPage({
   searchParams,
@@ -39,15 +40,10 @@ export default async function DashboardPage({
       ? params.month
       : undefined;
 
-  const categories = await getCategoriesByUserId(user.id);
-  const result = await getTransactions(
-    user.id,
-    transactionType,
-    page,
-    pageSize,
-    monthFilter,
-  );
-  const summaryResult = await getTransactionSummary(user.id);
+  const [categories, summaryResult] = await Promise.all([
+    getCategoriesByUserId(user.id),
+    getTransactionSummary(user.id),
+  ]);
 
   return (
     <>
@@ -95,19 +91,18 @@ export default async function DashboardPage({
                   Transactions
                 </h1>
 
-                <div className="mb-6">
-                  <TransactionFilters
-                    currentType={transactionType}
-                    currentMonth={monthFilter}
+                <Suspense
+                  key={`${transactionType ?? "all"}-${page}-${monthFilter ?? "any"}`}
+                  fallback={<TransactionsSectionSkeleton />}
+                >
+                  <TransactionsSection
+                    userId={user.id}
+                    transactionType={transactionType}
+                    page={page}
+                    pageSize={pageSize}
+                    monthFilter={monthFilter}
                   />
-                </div>
-
-                <TransactionTable
-                  transactions={result.transactions ?? []}
-                  totalCount={result.totalCount ?? 0}
-                  currentPage={page}
-                  pageSize={pageSize}
-                />
+                </Suspense>
               </div>
             </div>
           </div>
