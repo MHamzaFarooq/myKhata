@@ -180,7 +180,7 @@ export default function TransactionForm({
           defaultValue={new Date().toISOString().split("T")[0]}
           type="date"
           required
-          className="w-full rounded-full bg-[#0b1620] px-5 py-3.5 text-white outline-none focus:ring-2 focus:ring-white/20 [color-scheme:dark]"
+          className="w-full min-w-0 overflow-hidden rounded-full bg-[#0b1620] px-4 py-3.5 text-sm text-white outline-none focus:ring-2 focus:ring-white/20 [color-scheme:dark] sm:px-5 sm:text-base [&::-webkit-date-and-time-value]:text-left"
         />
       </div>
 
